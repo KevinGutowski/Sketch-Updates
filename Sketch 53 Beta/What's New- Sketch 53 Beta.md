@@ -12,10 +12,10 @@ The offical list can be found at [https://www.sketchapp.com/beta/](https://www.s
 	- Major Performance improvements when work with complex documents containing many prototyping flows.
 - Override Management
 	- You can now manage which overridable properties appear directly in the Symbol’s master.
-	![Manage Overrides Interface](/Users/kgutowski/Documents/Screenshots/manageoverrides.png)
+	![Manage Overrides Interface](https://github.com/KevinGutowski/Sketch-Updates/blob/master/Sketch%2053%20Beta/img/manageoverrides.png?raw=true)
 -  Overrides
 	-  Overrides in Symbols can now be selected via the Layer List, and in the Canvas when the Symbol instance is selected.  
-	![Selectable Overides in symbol instances](/Users/kgutowski/Documents/Screenshots/Selectable Overrides.gif)
+	![Selectable Overides in symbol instances](https://github.com/KevinGutowski/Sketch-Updates/blob/master/Sketch%2053%20Beta/img/Selectable%20Overrides.gif?raw=true)
 - Snapping Improvements
 	- Improved snapping for rotated layers
 	- Improved snapping while resizing multiple layers to indicate equal distances between the selection and other nearby layers
@@ -23,7 +23,7 @@ The offical list can be found at [https://www.sketchapp.com/beta/](https://www.s
 	- Improved the way shapes resize after being flipped on their axis
 - Redesigned Color Picker
 	- Colors can now be named and they are shared in the libraries
-	![Named Colors](/Users/kgutowski/Documents/Screenshots/Named Colors.png)
+	![Named Colors](https://github.com/KevinGutowski/Sketch-Updates/blob/master/Sketch%2053%20Beta/img/Named%20Colors.png?raw=true)
 	
 ##### Key Enhancements
 
