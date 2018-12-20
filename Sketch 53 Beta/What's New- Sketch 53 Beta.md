@@ -13,7 +13,7 @@ The offical list can be found at [https://www.sketchapp.com/beta/](https://www.s
 - Override Management
 	- You can now manage which overridable properties appear directly in the Symbol’s master.
 	![Manage Overrides Interface](https://github.com/KevinGutowski/Sketch-Updates/blob/master/Sketch%2053%20Beta/img/manageoverrides.png?raw=true)
--  Overrides
+-  Selectable Overrides inside Symbol Instances
 	-  Overrides in Symbols can now be selected via the Layer List, and in the Canvas when the Symbol instance is selected.  
 	![Selectable Overides in symbol instances](https://github.com/KevinGutowski/Sketch-Updates/blob/master/Sketch%2053%20Beta/img/Selectable%20Overrides.gif?raw=true)
 - Snapping Improvements
