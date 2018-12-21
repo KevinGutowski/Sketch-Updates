@@ -1,6 +1,7 @@
-# What's New: Sketch 53 Beta
-
 Hi all, I thought I would collect a list of noteable new user and api features for the Sketch 53 Beta. While the release notes do communicate what changed, I'm hoping this post can help suppliment them and provide us plugin devs a place to look for how to use the new features. Questions or feedback? Ask them below!
+
+##### Last Edited: Dec 21
+- Added some clarification from @mathieudutour
 
 ### App Changes
 
@@ -56,8 +57,8 @@ One pretty cool thing that I never noticed - If you find a regression in this be
 
 ### API CHANGES
 
-- The document from a library will now have a proper path (either local path or the appcast URL)
-	- I believe this is referring to the `.getDocument()` method of a library? I also couldn't find the PR that added this.
+- The document from a library will now have a proper path (either local path or the appcast URL) ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/265))
+	- Previously when you used library.getDocument() the path of the Document would be undefined. It's now set correctly.
 - Add _exportFormats_ property on _Layer_ ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/280/files))
 	- You can specify `size`, `suffix`, `prefix`, and `fileFomat`
 	- Valid fileFormats are 
@@ -119,7 +120,9 @@ console.log(layer)
 ```
 
 - No need to specify the type when there is no choice (like Document.pages can only contain Pages, Layer.exportFormats can only contain ExportFormats, etc.)",
-	- _Not sure what this means and what context it is referring to_
+	- _I was confused by this so @mathieudutour was able to give some clarification_
+	- "That's shouldn't affect anybody. Pretty much every object from the JS API is a wrapper around a native object (like _ExportFormats_ is a wrapper around _MSExportFormat_). The way the API works when creating a new wrapper is that it looks at the type field to create the underlying native object. But in some cases, there is no choices: the objects inside _exportFormats_ will always be _MSExportFormat_."
+	- So instead of `layer.exportFormats = [{type: 'ExportFormat, size: '2x'}]`, you can just write `layer.exportFormats = [{size: '2x'}]`
 
 - Add `UI.getInputFromUser` method and deprecate the other input methods ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/276/files))
 	- The same UI inputs are there (`String` and `Select`) but its moved over to the method `UI.getInputFromUser`
@@ -162,7 +165,7 @@ UI.getInputFromUser(
 
 - Add some `getParent*` methods on Layer ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/284))
 	- You can use `getParentPage()`, `getParentArtboard()`, `getParentSymbolMaster()`, and `getParentShape()` to quickly access higher level components
-	- You can also use the `parent` property on _Layer_ that was added to go up the layer structure.
+	- You can also use the `parent` property on _Layer_ ~~that was added~~ to go up the layer structure. _[Edit: this was there before]_
 	- Examples:
 
 ```
@@ -180,7 +183,7 @@ document.parent // will be undefined
 
 ```
 
-- Add support for text styles
+- Add support for text styles ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/283))
 	- LOTS of added functionality here
 	- Depreciated Methods
 		- `Text.systemFontSize`
@@ -192,10 +195,10 @@ document.parent // will be undefined
 			- `top`, `center`, `bottom`
 		- `kerning`
 			- default to `null` if there is none set
-			- _pretty sure there is a floating point error here when you set this through the UI_
 		- `lineHeight`
 			- defaults to `null` if nothing is set
 			- _would be nice to get the default since it varies from each font_
+				- _Edit: Seems like this will be fixed soon_ ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/318))
 		- `textColor`
 			- note that it can set in various formats `#000`, `#000000`, and the opacity variant `#000000FF`
 		- `fontSize`
@@ -279,22 +282,27 @@ Settings.sessionVariable('myVar')
 - Allow using setting methods even from the Run Script panel ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/302))
 	- Previously you couldn't test anything from `'sketch/settings'` in the script panel and now you can!
 
-
-##### Things that I couldn't get to work
-- Slices ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/280/files))
-	- Should work by `const slice = new Slice({ name: 'Test' })`
-	- You can also pass in _exportFormats_ 
+- Ability to make Slices ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/280/files))
+	- _I previously couldn't get this to work but now I can :D_
+	- You can make one by `const slice = new Slice({ name: 'Test' })`
+	- You can also pass in _exportFormats_ and a parent to tie it to a layer or object
 
 ```
 const artboard = new Slice({
-      exportFormats: [
-        {
+		parent: sketch.getSelectedDocument().selectedPage,
+		exportFormats: [
+		{
           size: '2x',
           suffix: '@2x',
-        },
-      ],
-    })    
+		},
+	],
+})    
 ```
 
-And thats about it. Thanks for reading!
-    
+- setTimeout and all the other timeout, interval, immediate methods are now available directly, no need to polyfill them. 
+	- _(I think this is the [Github PR](https://github.com/BohemianCoding/SketchAPI/pull/279/files) however the diff seems to be about fixing an issue with fragments_ 🤔_)_
+
+- A useful new method on the _path module_ to get resources in the plugin bundle ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/295))
+	-  `require('path').resourcePath(string)`  returns the path to a resource in the plugin bundle or `undefined` if it doesn't exist.
+
+And thats about it. Check out the comments by @mathieudutour below for some upcoming changes in the next betas. Thanks for reading!
