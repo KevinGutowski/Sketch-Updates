@@ -1,7 +1,16 @@
 Hi all, I thought I would collect a list of noteable new user and api features for the Sketch 53 Beta. While the release notes do communicate what changed, I'm hoping this post can help suppliment them and provide us plugin devs a place to look for how to use the new features. Questions or feedback? Ask them below!
 
-##### Last Edited: Dec 21
+##### Last Edited: Jan 14, 2019
 - Added some clarification from @mathieudutour
+- Added new method on `text.style` to get the default line height `.getDefaultLineHeight()`
+- Added a new action method called `LayersResized`
+- Fixed a floating point error with returning Kerning values
+- Added support for controlling the overrides of a Symbol
+- Obj-C exceptions will be thrown as JS Errors which will reference the exception in their `nativeException` property
+- Improvements to detaching Symbol instances
+- You can now easily rotate layers and flip them horizontally/vertically
+- Background property is now available on Artboards
+- New option to export sketch objects as JSON
 
 ### App Changes
 
@@ -195,10 +204,10 @@ document.parent // will be undefined
 			- `top`, `center`, `bottom`
 		- `kerning`
 			- default to `null` if there is none set
+			- _(there was an a floating point issue with the returned values but its been fixed here_ [Github PR](https://github.com/BohemianCoding/SketchAPI/pull/322)_)_
 		- `lineHeight`
 			- defaults to `null` if nothing is set
-			- _would be nice to get the default since it varies from each font_
-				- _Edit: Seems like this will be fixed soon_ ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/318))
+			- You can get the default line height from the method `getDefaultLineHeight()` ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/318))
 		- `textColor`
 			- note that it can set in various formats `#000`, `#000000`, and the opacity variant `#000000FF`
 		- `fontSize`
@@ -304,5 +313,118 @@ const artboard = new Slice({
 
 - A useful new method on the _path module_ to get resources in the plugin bundle ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/295))
 	-  `require('path').resourcePath(string)`  returns the path to a resource in the plugin bundle or `undefined` if it doesn't exist.
+
+- A new action was added called LayersResized. ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/323))
+	- The action context for this action contains two keys:
+		-  `document`: The document where the action was triggered
+		-  `layers`: An array of the layers being resized
+	-  Example:
+
+```
+// In your manifest.json you will need to add / modify the commands object
+  "commands": [
+	...
+    {
+      "name": "layerResized",
+      "identifier": "myLayerResized",
+      "script": "./my-command.js",
+      "handlers": {
+        "actions": {
+          "LayerResized.begin" : "layerResizedMethod"
+        }
+      }
+    }
+  ],
+  ...
+  
+ // And then in your my-command.js you can add this function
+  export function layerResizedMethod(context) {
+  	// Do some fancy stuff here with context.document or context.layers
+  }
+  
+  // Remember, some actions have a begin and finish phase so if you
+  // want the action to trigger once, you should modify the handler
+  // to be YourAction.begin or YourAction.finish. If you don't add
+  // anything, the action will be triggered twice.
+  // See https://developer.sketchapp.com/guides/action-api/ for more info
+
+```
+- You can now control whether or not a property is 'editable' for a Symbol Master override. Symbol instance overrides also have a property called 'editabled' ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/323))
+	- Example:
+
+```
+var sketch = require('sketch')
+var document = sketch.getSelectedDocument()
+var Artboard = require('sketch/dom').Artboard
+var Text = require('sketch/dom').Text
+var SymbolMaster = require('sketch/dom').SymbolMaster
+
+const artboard = new Artboard({
+  name: "test",
+  parent: document.selectedPage
+})
+
+const text = new Text({
+  text: 'test text value',
+  parent: artboard
+})
+
+const master = SymbolMaster.fromArtboard(artboard)
+master.overrides[0].editable = false
+const instance = master.createNewInstance()
+instance.parent = document.selectedPage
+instance.overrides[0].editable
+// false
+```
+
+- Obj-C exceptions will be thrown as JS Errors which will reference the exception in their `nativeException` property 
+	- _I believe its this_ [Github PR](https://github.com/BohemianCoding/SketchAPI/pull/324)
+	- _I don't know how to trigger an objective-c execption but will document one here if someone comments with an example or if I stumble upon one in the near future_
+
+- You can now detach symbol instances recursively so that nested symbols also detach. [Github PR](https://github.com/BohemianCoding/SketchAPI/pull/321)
+	- `instance.detach()` will just detach the outer symbol
+	- `instance.detach({recursively:true})` will detach nested symbols as well
+
+- You can now rotate layers. In addition, you can flip them vertically or horizontally. [Github PR](https://github.com/BohemianCoding/SketchAPI/pull/309)
+	- These can be found under the `transform` property
+	- You can set and get them as you would expect:
+
+```
+var layer = document.selectedLayers.layers[0]
+layer
+// { type: 'Text',
+// ...
+// transform:
+//    { rotation: 0,
+//      flippedHorizontally: false,
+//      flippedVertically: false },
+// ...
+
+layer.transform.rotation = 10
+document.sketchObject.inspectorController().reload()
+// be sure to reload the inspector to see your changes
+
+layer.transform.rotation
+// 10
+```
+- You can now get access to an Artboard's background properties [Github PR](https://github.com/BohemianCoding/SketchAPI/pull/311)
+	- `background.enabled`
+		- boolean, if the background is shown or not
+	- `background.includedInExport`
+		- boolean, if the background should be exported or if it should be transparent during the export
+	- `background.color`
+		- string, the rgba representation of the background color
+	- Example
+
+```
+var Artboard = require('sketch/dom').Artboard
+const artboard = new Artboard({name: 'Test'})
+
+artboard
+// { type: 'Artboard',
+// ...
+// background: { enabled: false, includedInExport: true, color: '#ffffffff' } }
+```
+- 
 
 And thats about it. Check out the comments by @mathieudutour below for some upcoming changes in the next betas. Thanks for reading!
