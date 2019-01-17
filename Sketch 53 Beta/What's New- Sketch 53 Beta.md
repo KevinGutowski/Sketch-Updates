@@ -10,7 +10,7 @@ Hi all, I thought I would collect a list of noteable new user and api features f
 - Improvements to detaching Symbol instances
 - You can now easily rotate layers and flip them horizontally/vertically
 - Background property is now available on Artboards
-- New option to export sketch objects as JSON
+- New option to export sketch objects as JSON archive
 
 ### App Changes
 
@@ -425,6 +425,18 @@ artboard
 // ...
 // background: { enabled: false, includedInExport: true, color: '#ffffffff' } }
 ```
-- 
+- `export` can now export to JSON
+	- Example:
+
+```
+var sketch = require('sketch')
+var Shape = require('sketch/dom').Shape
+const object = new Shape()
+const options = { formats: 'json', output: false }
+const sketchJSON = sketch.export(object, options)
+console.log(sketchJSON)
+// big JSON file
+
+```
 
 And thats about it. Check out the comments by @mathieudutour below for some upcoming changes in the next betas. Thanks for reading!
