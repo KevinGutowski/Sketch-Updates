@@ -425,7 +425,7 @@ artboard
 // ...
 // background: { enabled: false, includedInExport: true, color: '#ffffffff' } }
 ```
-- `export` can now export to JSON
+- `export` can now export to JSON [Github PR](https://github.com/BohemianCoding/SketchAPI/pull/306)
 	- Example:
 
 ```
