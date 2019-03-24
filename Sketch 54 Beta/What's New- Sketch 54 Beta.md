@@ -8,7 +8,7 @@ Sketch 54 Beta launched last week and I wanted to continue with documenting new 
 
 ### Add `colors` and `gradients` properties on Document and `globalAssets`
 ##### More details
-
+- `sketch.globalAssets` property was added
 - Two new asset types were added
 	- `ColorAsset`
 		- name, type: String (can be null)
