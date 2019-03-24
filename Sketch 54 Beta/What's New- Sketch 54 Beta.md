@@ -17,11 +17,9 @@ Sketch 54 Beta launched last week and I wanted to continue with documenting new 
 		- name, type: String (can be null)
 		- gradient, type: [Gradient](https://developer.sketchapp.com/reference/api/#gradient)
 
-##### Github PR
-[https://github.com/BohemianCoding/SketchAPI/pull/345](https://github.com/BohemianCoding/SketchAPI/pull/345)
-
-- Pretty sure most of the work came from this PR however `sketch.getGlobalColors()` was moved to `sketch.globalAssets.colors` (not sure what commit/PR made that change)
-	- I'm a little confused here bc it seems lots of the tests still use `.getGlobalColors`. Maybe move those tests over to use `sketch.globalAssets.colors`?
+##### Github PRs
+- [https://github.com/BohemianCoding/SketchAPI/pull/345](https://github.com/BohemianCoding/SketchAPI/pull/345)
+- [https://github.com/BohemianCoding/SketchAPI/pull/398](https://github.com/BohemianCoding/SketchAPI/pull/398)
 
 ##### Usage 
 
@@ -134,6 +132,45 @@ var selectedDocument = sketch.getSelectedDocument()
 let documentColors = selectedDocument.colors
 let documentGradients = selectedDocument.gradients
 ```
+
+### Shared styles are now document properties and can be mutated
+
+##### More Details
+
+##### Github PR
+
+##### Usage
+
+
+### `layer.index` can now be set
+
+##### More Details
+
+##### Github PR 
+- [https://github.com/BohemianCoding/SketchAPI/pull/399](https://github.com/BohemianCoding/SketchAPI/pull/399)
+
+##### Usage
+
+
+### Add `aspectRatio` property to Gradient
+
+##### More Details
+
+##### Github PR
+- [https://github.com/BohemianCoding/SketchAPI/pull/396](https://github.com/BohemianCoding/SketchAPI/pull/396)
+
+##### Usage
+
+
+### Add `selected` property and `getFrame` method on an Override
+
+##### More Details
+
+##### Github PR
+- [https://github.com/BohemianCoding/SketchAPI/pull/394](https://github.com/BohemianCoding/SketchAPI/pull/394)
+
+##### Usage
+
 
 ### API CHANGES
 
