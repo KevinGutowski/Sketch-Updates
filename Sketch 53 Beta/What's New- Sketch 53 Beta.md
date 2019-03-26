@@ -11,6 +11,8 @@ Hi all, I thought I would collect a list of noteable new user and api features f
 - You can now easily rotate layers and flip them horizontally/vertically
 - Background property is now available on Artboards
 - New option to export sketch objects as JSON archive
+- Additions to ShapePath
+- Pushing arrays work as expected now
 
 ### App Changes
 
