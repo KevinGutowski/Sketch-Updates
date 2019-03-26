@@ -657,6 +657,6 @@ page.sketchObject.documentData().symbolsPage() == page.sketchObject
 - jQuery-like selection method (ex: `find('[style.fills.color="#DEDEDE"]')`) ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/357))
 - Logging a selection object will now be a bit more helpful ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/432))
 - @christianklotz has been working hard on updating some of the developer documentation! I'm excited to see what changes will be made there.
-- A `CodeSnippetSupplier` to interact with Data plugins (I haven't messed with creating a Data plugin before, if you have I would love to read a post about what you made!) ([Github Branch](https://github.com/BohemianCoding/SketchAPI/compare/feature/23657))
+- A `CodeSnippetSupplier` to interact with Data Supplier plugins (I haven't messed with creating a Data Supplier plugin before. If you have I would love to read a post about what you made!) ([Github Branch](https://github.com/BohemianCoding/SketchAPI/compare/feature/23657))
 
 That's all I got for now! I'll be back to update this document if anything changes during the next beta releases.
