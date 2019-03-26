@@ -502,7 +502,7 @@ If you ever wanted to get at the thumbnail preview image data when something is 
 
 See [this issue](https://github.com/BohemianCoding/SketchAPI/issues/185) for more info why this was added.
 
-#####Quick Summary of Sketch's export options#####
+##### Quick Summary of Sketch's export options #####
 The method returns
 
 - `undefined` if `options.output` is `undefined` or a string
