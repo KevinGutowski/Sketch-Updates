@@ -1,13 +1,15 @@
-Sketch 54 Beta launched last week and I wanted to continue with documenting new additions to the API. Lots of great additions but I think the two biggest highlights of the release are that colors, gradients, shared text styles, and shared text styles have been added to `document` and colors & gradients have been added to the new `globalAssets` property! If you find anything that I missed, add them below in the comments. Also, if you have any questions with how things work be sure to ask!
+Sketch 54 Beta launched last week and I wanted to continue with documenting new additions to the API. As with the continued trend, the Sketch JS API has been getting lots of great additions. This time around colors, gradients, shared text styles, and shared layers styles have been added to `document`. Colors & gradients have been also added to the new `globalAssets` property! Plus a bunch more! I've also restructured the formatting a bit since the last update to help make things a bit easier to read. If you find anything that I missed, add them below in the comments. Also, if you have any questions with how things work be sure to ask!
 
 [< Sketch 53 Beta](https://sketchplugins.com/d/1162-what-s-new-sketch-53-beta)
 
 ##### Last Edited: March 24, 2019
 - *Often later sketch beta releases will have some further API changes and I'll note them here.*
 
+---
+
 # API Changes
 
-### Add `colors` and `gradients` properties on Document and `globalAssets`
+###  `colors` and `gradients` properties have been added on Document and `globalAssets`
 ##### More details
 - `sketch.globalAssets` property was added
 - Two new asset types were added
@@ -32,9 +34,6 @@ var colors = sketch.globalAssets.colors
 
 Setting Global Colors (Be sure to save a copy of your global assets before playing with this!)
 
-- Default assets can be found here (#TODO gist link)
-
-
 ```
 var globalAssets = sketch.globalAssets
 globalAssets.colors = ['#FFFFFF']
@@ -50,7 +49,7 @@ globalAssets.colors = ['#FFFFFF']
 globalAssets.colors = [{name: 'white', color: '#FFFFFF'}]
 ```
 
-Somewhat surprisingly this doesn't work?
+Note that this doesn't work?
 
 ```
 var globalColors = sketch.globalAssets.colors
@@ -134,12 +133,12 @@ let documentColors = selectedDocument.colors
 let documentGradients = selectedDocument.gradients
 ```
 
---
+---
 
 ### Shared styles are now `document` properties and can be mutated
 
 ##### More Details
-- Two new properties on `document`
+- Two new properties on `document` (try not to get them mixed up as the styles are subtly different!)
 	- `sharedLayerStyles`
 	- `sharedTextStyles`
 
@@ -207,7 +206,7 @@ selectedDocument.sharedTextStyles.push({
 })
 ```
 
---
+---
 
 ### `layer.index` can now be set
 
@@ -243,9 +242,9 @@ console.log(group1.index, group2.index, group3.index)
 
 ```
 
---
+---
 
-### Add `aspectRatio` property to Gradient
+### `aspectRatio` property has been added to `Gradient`
 
 ##### More Details
 When the gradient is `Radial`, the `from` and `to` points makes one axis of the ellipse of the gradient while the aspect ratio determines the length of the orthogonal axis (`aspectRatio === 1` means that it’s a circle).
@@ -289,9 +288,9 @@ let myShape = new ShapePath({
 })
 ```
 
---
+---
 
-### Add `selected` property and `getFrame` method on an Override
+### `selected` property and `getFrame` method have been added on an symbol override
 
 ##### More Details
 The frame of an override can be different than the frame of its affected Layer in case where the Symbol Instance has been scaled or, in the case of the example below, the text value is changed for the symbol instance resulting in a shorter frame.
@@ -348,7 +347,7 @@ symbolInstance.overrides[0].value = "hi"
 symbolInstance.overrides[0].selected = true
 symbolInstance.overrides[0].getFrame().width
 ```
---
+---
 
 ### `layer.duplicate` now works on a layer with no parent
 
@@ -386,7 +385,7 @@ rectangle2.frame.offset(110,0)
 rectangle.parent = page
 rectangle2.parent = page
 ```
---
+---
 
 ### `symbolInstance.master` now works on an immutable instance
 
@@ -396,9 +395,9 @@ If you ever got an `MSImmutableSymbolInstance` object and attempted to wrap the 
 ##### Github PR
 - [https://github.com/BohemianCoding/SketchAPI/pull/390](https://github.com/BohemianCoding/SketchAPI/pull/390)
 
---
+---
 
-### Setting `flow` as `undefined` on a Layer
+### You can now remove flow targets with setting `flow` as `undefined` on a Layer
 
 ##### More Details
 Previously you couldn't remove a flow target. Now you can!
@@ -436,9 +435,9 @@ const rect = new Group({
 rect.flow = undefined
 ```
 
---
+---
 
-### Add `noise` and `pattern` properties on Fill
+### `noise` and `pattern` properties have been added to Fill
 
 ##### More Details
 - "Noise" seems to point to some new type of fill (setting this on a layer will currently crash Sketch)
@@ -482,7 +481,7 @@ let rectangle = new ShapePath({
 
 ```
 
---
+---
 
 ### An image buffer can now be used with `ImageData`
 
@@ -492,11 +491,7 @@ This change helps with the next one (Export now returns a buffer if output is fa
 ##### Github PR
 - [https://github.com/BohemianCoding/SketchAPI/pull/372](https://github.com/BohemianCoding/SketchAPI/pull/372)
 
-##### Usage
-```
-```
-
---
+---
 
 ### `export` now returns a Buffer if `options.output` is `false` and `options.formats` is an image format
 
@@ -517,12 +512,35 @@ The method returns
 - an `Object` if `objectToExport` is a single item and `options.formats` is json
 
 ##### Github PR
-- [https://github.com/BohemianCoding/SketchAPI/pull/361/files](https://github.com/BohemianCoding/SketchAPI/pull/361/files)
+- [https://github.com/BohemianCoding/SketchAPI/pull/361](https://github.com/BohemianCoding/SketchAPI/pull/361)
 
 ##### Usage
 ```
+var sketch = require('sketch')
+var ShapePath = sketch.ShapePath
+var Rectangle = sketch.Rectangle
+var Style = sketch.Style
+var document = sketch.getSelectedDocument()
+var page = document.selectedPage
+
+page.layers = []
+
+let rectangle = new ShapePath({
+  name: "my shape",
+  frame: new Rectangle(0,0,100,100),
+  style: { 
+    fills: [{ 
+      fill: Style.FillType.Color,
+      color: '#000'  
+    }]
+  },
+  parent: page
+})
+
+const options = { formats: 'png', output: false }
+const buffer = sketch.export(rectangle, options)
 ```
---
+---
 
 ### `getSelectedDocument` will try harder to find your document
 
@@ -533,14 +551,14 @@ If you are using [SKPM](https://github.com/skpm/skpm), SKPM defines `context` as
 - [https://github.com/BohemianCoding/SketchAPI/pull/363](https://github.com/BohemianCoding/SketchAPI/pull/363)
 
 
---
+---
 
 ### `console.clear` will now clear the DevTools console
 
 ##### More Details
-I can't get this to work 🙃
+I can't get this to work 🙃. It should be fixed in the next beta ([link](https://github.com/BohemianCoding/SketchAPI/issues/433)).
 
---
+---
 
 ### `selectedPage` and `selectedLayers` can now be set on the Document
 
@@ -589,7 +607,7 @@ document.selectedPage = newPage
 // Note: selectedPage isn't an array like selectedLayers
 // Note2: You can also do newPage.selected = true
 ```
---
+---
 
 ### Add some methods to deal with the Symbols Page
 
@@ -632,3 +650,13 @@ If you have multiple pages with "Symbols" I believe that `.isSymbolsPage()` will
 ```
 page.sketchObject.documentData().symbolsPage() == page.sketchObject
 ```
+
+---
+
+### Upcoming Additions
+- jQuery-like selection method (ex: `find('[style.fills.color="#DEDEDE"]')`) ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/357))
+- Logging a selection object will now be a bit more helpful ([Github PR](https://github.com/BohemianCoding/SketchAPI/pull/432))
+- @christianklotz has been working hard on updating some of the developer documentation! I'm excited to see what changes will be made there.
+- A `CodeSnippetSupplier` to interact with Data plugins (I haven't messed with creating a Data plugin before, if you have I would love to read a post about what you made!) ([Github Branch](https://github.com/BohemianCoding/SketchAPI/compare/feature/23657))
+
+That's all I got for now! I'll be back to update this document if anything changes during the next beta releases.
