@@ -2,8 +2,9 @@ Sketch 54 Beta launched last week and I wanted to continue with documenting new 
 
 [< Sketch 53 Beta](https://sketchplugins.com/d/1162-what-s-new-sketch-53-beta)
 
-##### Last Edited: March 24, 2019
-- *Often later sketch beta releases will have some further API changes and I'll note them here.*
+##### Last Edited: Apri 7, 2019
+- `console.clear` now works properly
+- Removed `noise` property on Fill (since its not supported with later versions of Sketch)
 
 ---
 
@@ -437,10 +438,10 @@ rect.flow = undefined
 
 ---
 
-### `noise` and `pattern` properties have been added to Fill
+### `pattern` properties have been added to Fill
 
 ##### More Details
-- "Noise" seems to point to some new type of fill (setting this on a layer will currently crash Sketch)
+- Previously this also applied to the `noise` property as well but Sketch has depreciated the noise fill option in favor of having the noise patterns be image fills.
 
 ##### Github PR
 - [https://github.com/BohemianCoding/SketchAPI/pull/363](https://github.com/BohemianCoding/SketchAPI/pull/363)
@@ -556,7 +557,7 @@ If you are using [SKPM](https://github.com/skpm/skpm), SKPM defines `context` as
 ### `console.clear` will now clear the DevTools console
 
 ##### More Details
-I can't get this to work 🙃. It should be fixed in the next beta ([link](https://github.com/BohemianCoding/SketchAPI/issues/433)).
+Use `console.clear()` to clean up your console.
 
 ---
 
