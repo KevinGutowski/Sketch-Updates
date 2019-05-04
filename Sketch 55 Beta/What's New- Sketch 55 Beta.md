@@ -23,8 +23,57 @@
 
 ##### Usage
 ```
-// example here
+// Need to have manifest file setup properly to be able to trigger a function on the HandleURL Action
+{
+  "identifier": "com.sketchapp.examples.log-message",
+  "compatibleVersion": 3,
+  "bundleVersion": 1,
+  "icon": "icon.png",
+  "commands": [
+    {
+      "name": "Log Message",
+      "identifier": "log-message",
+      "script": "./log-message.js",
+      "handlers": {
+        "actions": {
+          "HandleURL": "handleURL"
+        }
+      }
+    }
+  ]
+}
 ```
+
+```
+// Then in JS File
+const sketch = require('sketch')
+function handleURL(context) {
+    let query = context.actionContext.query
+    sketch.UI.message(query.foo)
+}
+```
+
+Then when the user navigates to the url `sketch://plugin/com.sketchapp.examples.log-message/log-message?foo=hello%20world` a message will appear in the app with the text "Hello World".
+
+Note that the user in this case will need to have the plugin installed and a document already open. You can also made a new document for the user like this:
+
+```
+const sketch = require('sketch')
+const Document = sketch.Document
+const currentDocument = sketch.getSelectedDocument()
+
+function handleURL(context) {
+    let query = context.actionContext.query
+    if (currentDocument) {
+        sketch.UI.message(query.foo)
+    } else {
+        let document = new Document()
+        sketch.UI.message(query.foo)
+    }
+}
+```
+
+Full plugin example can be found at [https://github.com/KevinGutowski/HandleURL_Example](https://github.com/KevinGutowski/HandleURL_Example)
 
 ### Add `isSelected` method on a CurvePoint
 ##### More details
