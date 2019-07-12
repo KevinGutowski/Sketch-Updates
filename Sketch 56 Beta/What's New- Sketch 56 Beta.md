@@ -1,8 +1,11 @@
-Hello everyone! I'm back again to help document what has changed in the new beta release. 55 has only a few changes compared to the massive release of 54. That being said, definitely be sure to check out the new URL scheme that lets you target particular commands of your plugin. You can even pass in query parameters! Super neat. So neat, I've included a plugin example. Lastly, I wrote a little guide to [writing your first sketch plugin](https://medium.com/@kevingutowski/how-to-build-your-first-sketch-plugin-14c0e9e56bf0). If you know any new developers or designers interested in plugin development, be sure to send them that article!
+- Lots of documentation updates, be sure to read up on the documentation
+	- API updates are also documented there https://developer.sketch.com/plugins/updates/new-in-sketch-55 (you might see some similarities with my update posts here ;D)
+- Link to Matt's article
+- Link out to my post on getting your plugin to subscribe to autoupdates
 
 [< Sketch 55 Beta](https://sketchplugins.com/d/1394-what-s-new-sketch-beta-55)
 
-##### Last Edited: May 4, 2019
+##### Last Edited: July 11, 2019
 
 ---
 
@@ -53,6 +56,11 @@ const p3Doc = new Document({ colorSpace: ColorSpace.P3 })
 ###  Expose substring in `Text.fragment`
 ##### More details
 -  Now there is more information about how a piece of text breaks across multiple lines.
+	-  You'll have access to the `rect`, `baselineOffset`, `range`, and `text` of each line
+	-  `baselineOffset` is the distance from the bottom of the line fragment rectangle in which the glyph resides to the baseline
+
+![typographic labels](https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/Art/glyph_metrics_2x.png)
+	- I think its the distance from the baseline to the bottom line (frame) of the text.
 
 ##### Github PR
 - [https://github.com/BohemianCoding/SketchAPI/pull/492/](https://github.com/BohemianCoding/SketchAPI/pull/492/)
@@ -64,47 +72,171 @@ test to see how a fixed width text object will break across multiple lines (not 
 ```
 
 
-### Improve consistency by deprecating `Fill.fill` in favor of `Fill.fillType`
-##### More details
--  This was done to match `Border.fileType` and other types
+### `symbolMaster.getParentSymbolMaster` used to throw an error. It will now return `undefined`
 
 ##### Github PR
-- [https://github.com/BohemianCoding/SketchAPI/pull/463](https://github.com/BohemianCoding/SketchAPI/pull/463)
+- [https://github.com/BohemianCoding/SketchAPI/pull/487](https://github.com/BohemianCoding/SketchAPI/pull/487)
 
 ##### Usage
 ```
-// Setting a fill is more consistent to setting a border
-const style = new Style({
-    fills: [
-        {
-            color: '#1234',
-            fillType: Style.FillType.Color
-        }
-    ]
+var sketch = require('sketch')
+var document = sketch.getSelectedDocument()
+var layer = document.selectedLayers.layers[0]
+
+layer.getParentSymbolMaster()
+// used throw an error but now does not!
+```
+
+### Fix setting layers of a group when the layers already had a parent
+##### More details
+- There was a bug with reassigning layers to a group that already had parents. You would need to first remove the parent before assigning the layers to a group.
+
+##### Github PR
+- [https://github.com/BohemianCoding/SketchAPI/pull/486](https://github.com/BohemianCoding/SketchAPI/pull/486)
+
+##### Usage
+```
+// say you have some layers that have an artboard as their parent
+let myLayers = [mySquare, myTriangle, myHexagon, myCircle]
+
+// if you reassign them to be within a group
+let myGroup = new Group({
+	name: "My Group",
+	layers: myLayers,
+	parent: myArtboard
+})
+myGroup.adjustToFit()
+
+// then two references of the layers would be stored, one with parents to myArtboard and one with parents to myGroup
+// in order to fix this you would need to remove the reference to the parent on each of the layers before assigning them to a group
+
+// remove the parent for each layer
+myLayers.forEach(layer => layer.remove())
+
+// This update makes it so that you can easily assign layers to a group even if those layers already have a parent set
+// Now just do this
+
+let myLayers = [mySquare, myTriangle, myHexagon, myCircle]
+let myGroup = new Group({
+	name: "My Group",
+	layers: myLayers,
+	parent: myArtboard
 })
 
-// Was previously
-const style = new Style({
-    fills: [
-        {
-            color: '#1234',
-            fill: Style.FillType.Color
-        }
-    ]
+```
+
+### Changing the `pointType` of a CurvePoint wouldn't always restore the control points
+##### More Details
+- There was a bug with setting the `pointType` of a line. This made it so that you could only create straight lines rather than curved ones
+
+##### Github PR
+- [https://github.com/BohemianCoding/SketchAPI/pull/481](https://github.com/BohemianCoding/SketchAPI/pull/481)
+
+##### Usage
+```
+let sketch = require('sketch')
+let document = sketch.getSelectedDocument()
+let page = document.selectedPage
+
+page.layers = []
+
+let Artboard = sketch.Artboard
+let myArtboard = new Artboard({
+  frame: { x: 0, y: 0, width: 48, height: 48 },
+  parent: page
+})
+
+var point1 = {
+    pointType: 'CurvePoint',
+    curveFrom: { x: 0, y: 0 },
+    curveTo: { x: 0, y: 2 },
+    point: { x: 0, y: 1 },
+    pointType: 'Disconnected'
+}
+var point2 = {
+    pointType: 'CurvePoint',
+    curveFrom: { x: 1, y: 0 },
+    curveTo: { x: 1, y: 0 },
+    point: { x: 1, y: 0 },
+    pointType: 'Straight'
+}
+
+let ShapePath = sketch.ShapePath
+let path = new ShapePath({
+  type: ShapePath.ShapeType.Custom,
+  points: [point1, point2],
+  frame: { x: 0, y: 0, width: 48, height: 48 },
+  style: { fills: [], borders: ['#FF0000']},
+  frame: { x: 0, y: 0, width: 48, height: 48 },
+  parent: myArtboard,
+  closed: false
+})
+
+// should create a curved line rather than a straight one
+```
+
+### Added multiline functionality to string inputs on `UI.getInputFromUser`
+##### More Details
+- Previously you could only ask for a single line of input from a user via the JS API. Now you can specify a number of lines so that users can input larger amounts of text.
+
+##### Github PR
+- [https://github.com/BohemianCoding/SketchAPI/pull/475](https://github.com/BohemianCoding/SketchAPI/pull/475) (I made this PR :D)
+
+##### Usage
+```
+let sketch = require('sketch')
+let UI = sketch.UI
+
+UI.getInputFromUser("What's your favorite design tool?", {
+  type: UI.INPUT_TYPE.textarea,
+  numberOfLines: 10,
+  initialValue: 'hi',
+}, (err, value) => {
+  if (err) {
+    // most likely the user canceled the input
+    return
+  }
+  console.log(value)
 })
 ```
 
-### Some better logging of the `prototype` of wrapped objects
-##### More details
-- There was a bug in the `util.inspect` algorithm (which console uses) that makes it think the prototype of a wrapped object is a wrapped object and uses the code path for wrapped object. This has been fixed for better logging output.
+![Example popover with a textarea input](https://user-images.githubusercontent.com/4199296/56643841-51009700-662f-11e9-8425-95969f0fd3dc.png)
+
+### `ShapeType.Rectangle` used to be defaulted even if some points are specified when create a new ShapePath
+##### More Details
+- Previously, you couldn't draw a proper line with the API (you could get close but it didn't quite behave the same as a line that you could draw in Sketch). This has been now fixed.
+- Here is a snippet from the API documentation
+
+> You can only set the `shapeType` when creating a new one. Once it is created, the `shapeType` is read-only. If it is not specified and you do not specify any `points`, it will default to `ShapePath.ShapeType.Rectangle` (if you do specify some `points`, it will default to `ShapePath.ShapeType.Custom`
 
 ##### Github PR
-- [https://github.com/BohemianCoding/SketchAPI/pull/451](https://github.com/BohemianCoding/SketchAPI/pull/451)
+- [https://github.com/BohemianCoding/SketchAPI/pull/468](https://github.com/BohemianCoding/SketchAPI/pull/468)
+
+##### Usage
+```
+let sketch = require('sketch')
+let ShapePath = sketch.ShapePath
+
+let myLine = new ShapePath({
+  name: 'myLine',
+  frame: {x: 10, y: 0, width: 40, height: 100},
+  style: { borders: ['#FF0000'] },
+  points: [{ point: { x: 0, y: 0 }, pointType: 'Straight'}, { point: { x: 1, y: 1 }, pointType: 'Straight'}],
+  parent: myArtboard
+})
+
+myLine.shapeType
+// would report 'Rectangle' but now will be 'Custom' because we specified some points
+// previously this would behave like a rectangle with a path inside the frame but now it behaves like a line as expected
+// NEED TO CONFIRM
+```
+### Improve consistency by deprecating `Fill.fill` in favor of `Fill.fileType` (to match `Border.fileType` and other types)
+
+
 
 ### Upcoming Additions
-- [Fixed] Changing the `pointType` of a CurvePoint wouldn't always restore the control points ([GitHub PR](https://github.com/BohemianCoding/SketchAPI/pull/481))
-- [Fixed] Do not default to `ShapeType.Rectangle` if some points are specified when create a new ShapePath ([GitHub PR](https://github.com/BohemianCoding/SketchAPI/pull/468))
-- [Improved] Added multiline functionality to string inputs on `UI.getInputFromUser` (I added this in! :D, [GitHub PR](https://github.com/BohemianCoding/SketchAPI/pull/475))
+- Need to add
+
 
 ---
 As always, if you have any questions or feedback be sure to comment below!
