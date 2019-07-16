@@ -24,7 +24,7 @@
 - [https://github.com/BohemianCoding/SketchAPI/pull/533/files](https://github.com/BohemianCoding/SketchAPI/pull/533/files)
 
 ##### Usage
-```
+```javascript
 let sketch = require('sketch')
 let document = sketch.getSelectedDocument()
 
@@ -66,7 +66,7 @@ const p3Doc = new Document({ colorSpace: ColorSpace.P3 })
 - [https://github.com/BohemianCoding/SketchAPI/pull/492/](https://github.com/BohemianCoding/SketchAPI/pull/492/)
 
 ##### Usage
-```
+```javascript
 test to see how a fixed width text object will break across multiple lines (not using \n)
 
 ```
@@ -78,7 +78,7 @@ test to see how a fixed width text object will break across multiple lines (not 
 - [https://github.com/BohemianCoding/SketchAPI/pull/487](https://github.com/BohemianCoding/SketchAPI/pull/487)
 
 ##### Usage
-```
+```javascript
 var sketch = require('sketch')
 var document = sketch.getSelectedDocument()
 var layer = document.selectedLayers.layers[0]
@@ -95,7 +95,7 @@ layer.getParentSymbolMaster()
 - [https://github.com/BohemianCoding/SketchAPI/pull/486](https://github.com/BohemianCoding/SketchAPI/pull/486)
 
 ##### Usage
-```
+```javascript
 // say you have some layers that have an artboard as their parent
 let myLayers = [mySquare, myTriangle, myHexagon, myCircle]
 
@@ -133,7 +133,7 @@ let myGroup = new Group({
 - [https://github.com/BohemianCoding/SketchAPI/pull/481](https://github.com/BohemianCoding/SketchAPI/pull/481)
 
 ##### Usage
-```
+```javascript
 let sketch = require('sketch')
 let document = sketch.getSelectedDocument()
 let page = document.selectedPage
@@ -183,7 +183,7 @@ let path = new ShapePath({
 - [https://github.com/BohemianCoding/SketchAPI/pull/475](https://github.com/BohemianCoding/SketchAPI/pull/475) (I made this PR :D)
 
 ##### Usage
-```
+```javascript
 let sketch = require('sketch')
 let UI = sketch.UI
 
@@ -213,7 +213,7 @@ UI.getInputFromUser("What's your favorite design tool?", {
 - [https://github.com/BohemianCoding/SketchAPI/pull/468](https://github.com/BohemianCoding/SketchAPI/pull/468)
 
 ##### Usage
-```
+```javascript
 let sketch = require('sketch')
 let ShapePath = sketch.ShapePath
 
@@ -232,13 +232,21 @@ myLine.shapeType
 ```
 ### Improve consistency by deprecating `Fill.fill` in favor of `Fill.fileType` (to match `Border.fileType` and other types)
 
-### Find Endpoint
+### Added a Find Method to easily query a scope of a document
 ##### More Details
 Todo
 
+##### Github PR
+- [https://github.com/BohemianCoding/SketchAPI/pull/357/](https://github.com/BohemianCoding/SketchAPI/pull/357/)
+
+##### Usage
+```javascript
+var sketch = require('sketch/dom')
+sketch.find('Shape')
+```
+
 ### Upcoming Additions
 - Need to add
-
 
 ---
 As always, if you have any questions or feedback be sure to comment below!
