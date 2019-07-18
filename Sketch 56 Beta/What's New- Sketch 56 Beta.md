@@ -1,11 +1,17 @@
-- Lots of documentation updates, be sure to read up on the documentation
-	- API updates are also documented there https://developer.sketch.com/plugins/updates/new-in-sketch-55 (you might see some similarities with my update posts here ;D)
-- Link to Matt's article
-- Link out to my post on getting your plugin to subscribe to autoupdates
+Hiya everyone! Sketch 56 Beta is here (ya, I'm a little late however better late than never!) and I'm here to share what is new with the Sketch JS API. Now, before I dive into the details I wanted to share a few links to some helpful resources.
+
+There have been lots and lots of documentation updates! Be sure to check them out at [https://developer.sketch.com](https://developer.sketch.com) (File format for example, has been getting some love)!  Also, my API updates are also being recorded there as well ([https://developer.sketch.com/plugins/updates/new-in-sketch-55](https://developer.sketch.com/plugins/updates/new-in-sketch-55). 
+
+Matt Curtis (@matt_sven) wrote a fantastic two part article about Sketch plugin development and I encourage you all to check it out! He has been working hard on it and it really shows! I definitely learned a couple tricks!
+[https://www.smashingmagazine.com/2019/07/build-sketch-plugin-javascript-html-css-part-1/](https://www.smashingmagazine.com/2019/07/build-sketch-plugin-javascript-html-css-part-1/)
+
+Lastly, I wrote a post here on sketchplugins about how to publish updates to your plugin with Github Releases. It covers all about how to setup that `appcast.xml` file. [https://sketchplugins.com/d/1465-how-to-publish-updates-to-your-plugin-with-github-releases](https://sketchplugins.com/d/1465-how-to-publish-updates-to-your-plugin-with-github-releases)
+
+If you wrote a helpful article about sketch plugin development, shoot me a message on Twitter ([@kevgski](https://twitter.com/kevgski)) and I'll include along with the next API update notes. With that being said, let's get on with the show!
 
 [< Sketch 55 Beta](https://sketchplugins.com/d/1394-what-s-new-sketch-beta-55)
 
-##### Last Edited: July 11, 2019
+##### Last Edited: July 18, 2019
 
 ---
 
@@ -48,7 +54,7 @@ const p3Doc = new Document({ colorSpace: ColorSpace.P3 })
 
 ### Logging native structs now have nicer output in DevTools
 ##### More details
--  Previously, logging something like NSRange would return an unhelpful message and now it returns the location and range as you would expect.
+-  Previously, logging things like `NSRange` would return an unhelpful message and now it returns the location and range as you would expect.
 
 ##### Github Commit
 - [https://github.com/skpm/console/commit/91791a321fe1643de09884c3ba8d75a44312eddf](https://github.com/skpm/console/commit/91791a321fe1643de09884c3ba8d75a44312eddf)
@@ -57,18 +63,53 @@ const p3Doc = new Document({ colorSpace: ColorSpace.P3 })
 ##### More details
 -  Now there is more information about how a piece of text breaks across multiple lines.
 	-  You'll have access to the `rect`, `baselineOffset`, `range`, and `text` of each line
-	-  `baselineOffset` is the distance from the bottom of the line fragment rectangle in which the glyph resides to the baseline
+	-  `baselineOffset` is the distance from the bottom of the line fragment rectangle in which the glyph resides to the baseline (here is a graphic to help visualize this)
 
 ![typographic labels](https://developer.apple.com/library/archive/documentation/TextFonts/Conceptual/CocoaTextArchitecture/Art/glyph_metrics_2x.png)
-	- I think its the distance from the baseline to the bottom line (frame) of the text.
+I think its the distance from the baseline to the bottom line (frame) of the text. Ultimately, `Text.fragment` is most useful to see how a fixed text width text object will break across multiple lines
+	
 
 ##### Github PR
 - [https://github.com/BohemianCoding/SketchAPI/pull/492/](https://github.com/BohemianCoding/SketchAPI/pull/492/)
 
 ##### Usage
 ```javascript
-test to see how a fixed width text object will break across multiple lines (not using \n)
+let sketch = require('sketch')
+let Text = sketch.Text
+let Artboard = sketch.Artboard
 
+let document = sketch.getSelectedDocument()
+let page = document.selectedPage
+
+let myArtboard = new Artboard({
+  frame: {x: 0, y: 0, width: 400, height: 400},
+  parent: page
+})
+
+let myText = new Text({
+  text: "Our planet is a lonely speck in the great enveloping cosmic dark.",
+  frame: {x: 50, y: 50, width: 100, height: 100},
+  fixedWidth: true,
+  parent: myArtboard
+})
+
+console.log(myText.fragments)
+// [ { rect: 
+//      { x: [Getter/Setter],
+//        y: [Getter/Setter],
+//        width: [Getter/Setter],
+//        height: [Getter/Setter] },
+//     baselineOffset: 3,
+//     range: NSRange { location: 0, length: 36 },
+//     text: 'Our planet is a lonely speck in the ' },
+//   { rect: 
+//      { x: [Getter/Setter],
+//        y: [Getter/Setter],
+//        width: [Getter/Setter],
+//        height: [Getter/Setter] },
+//     baselineOffset: 3,
+//     range: NSRange { location: 36, length: 29 },
+//     text: 'great enveloping cosmic dark.' } ]
 ```
 
 
@@ -216,6 +257,15 @@ UI.getInputFromUser("What's your favorite design tool?", {
 ```javascript
 let sketch = require('sketch')
 let ShapePath = sketch.ShapePath
+let Artboard = sketch.Artboard
+
+let document = sketch.getSelectedDocument()
+let page = document.selectedPage
+
+let myArtboard = new Artboard({
+  frame: {x: 0, y: 0, width: 400, height: 400},
+  parent: page
+})
 
 let myLine = new ShapePath({
   name: 'myLine',
@@ -225,28 +275,134 @@ let myLine = new ShapePath({
   parent: myArtboard
 })
 
-myLine.shapeType
+console.log(myLine.shapeType)
 // would report 'Rectangle' but now will be 'Custom' because we specified some points
 // previously this would behave like a rectangle with a path inside the frame but now it behaves like a line as expected
-// NEED TO CONFIRM
 ```
-### Improve consistency by deprecating `Fill.fill` in favor of `Fill.fileType` (to match `Border.fileType` and other types)
+### Improve consistency by deprecating `Fill.fill` in favor of `Fill.fileType`
+##### More Details
+- This change was made to match `Border.fileType` and other types
+
+##### Github PR
+- [https://github.com/BohemianCoding/SketchAPI/pull/463](https://github.com/BohemianCoding/SketchAPI/pull/463)
+
+##### Usage
+```javascript
+let sketch = require('sketch')
+let Style = sketch.Style
+
+const style = new Style({
+  fills: [{
+    color: '#1234',
+    fill: Style.FillType.Color,
+  }]
+})
+
+console.log(style.fills[0])
+// Fill {
+//   fillType: 'Color', //used to be 'fill'
+//   color: '#11223344',
+//   ...
+//   enabled: true }
+```
 
 ### Added a Find Method to easily query a scope of a document
 ##### More Details
-Todo
+- Last but not least is a new way to find objects that meet various criteria. It kind of reminds me a little of jquery selectors.
+- The find method can take two arguments
+	- A selector (the properties or criteria that you are trying to find)
+	- The scope (what part of the sketch document do you want to search - by default it is the current document)
+- Selectors are of type `string` and can be of the following
+	- name
+	- id
+	- frame
+	- frame.x
+	- frame.y
+	- frame.width
+	- frame.height
+	- locked
+	- hidden
+	- selected
+	- type
+	- style.fills.color
+	- (would love to see these selectors expanded upon!)
+- You can use these selectors in conjunction with an operator
+	- `=` (equal)
+	- `*=` (contains) 
+	- `$=` (endswith)
+	- `!=` (not equal)
+	- `^=` (begins with)
+	- `>=` (greater than or equal)
+	- `=<` (less than or equal)
+	- `>` (greater than)
+	- `<` (less than)
+- An example of this would be `find('[name="Rectangle"]', document)`. Some Selectors have shorthand notation
+	- type: `find('ShapePath', document)`
+	- id: ``find(`#${layer_id}`, document)``or `find("#91EC1D70-6A97-...-DEE84160C4F4", document)`
+	- all others: `find('[{{type}}="Something"]', document)`
+- Also, by default the scope is the current document so you can drop the scope if you like
+	- `find('[name="Rectangle"]')`
 
 ##### Github PR
 - [https://github.com/BohemianCoding/SketchAPI/pull/357/](https://github.com/BohemianCoding/SketchAPI/pull/357/)
 
 ##### Usage
 ```javascript
-var sketch = require('sketch/dom')
+let sketch = require('sketch')
+let document = sketch.getSelectedDocument()
+let page = document.selectedPage
+
+// find all Shapes in the current Document
 sketch.find('Shape')
+
+// find all Layers in the first Artboard of the selected Page
+let artboard = page.layers[0]
+sketch.find('*', artboard)
+
+// find all the Layers named "Recipe"
+sketch.find('[name="Recipe"]')
+
+// More examples
+document.pages = [{
+	layers: [
+		{ type: 'Artboard', name: 'myArtboard', frame: { x: 300 } },
+		{ type: 'ShapePath', name: 'test' , frame: { x: 400 } },
+		{ type: 'ShapePath', name: 'test2', frame: { x: 100 } }
+	]
+}]
+
+// find by name containing
+sketch.find('[name*="test"]', document)
+// [ ShapePath( { name: 'test', ... }), ShapePath( { name: 'test2', ... } ]
+
+// find by different name
+sketch.find('[name!="test"]', document)
+// [ Page(...), Artboard( { name: 'myArtboard', ... } ), ShapePath( { name: 'test2', ... } ]
+
+// find by name ending with
+sketch.find('[name$="2"]', document)
+// [ ShapePath( { name: 'test2', ... } ]
+
+// find by name beginning with
+sketch.find('[name^="test"]', document)
+// [ ShapePath( { name: 'test', ... }), ShapePath( { name: 'test2', ... } ]
+
+// find by frame.x greater than 300
+sketch.find('[frame.x>300]', document)
+// [ ShapePath( { name: 'test', ... } ]
+
+// find by frame.x greater than 200 and is a 'ShapePath'
+sketch.find('ShapePath, [frame.x>200]', document)
+// [ ShapePath( { name: 'test', ... } ]
+
+// find with id
+find(`#${document.pages[0].layers[1].id}`, document)
+// [ ShapePath( { name: 'test', ... } ]
 ```
 
 ### Upcoming Additions
-- Need to add
+- Expose `PointType` enum on `ShapePath` ([https://github.com/BohemianCoding/SketchAPI/pull/561](https://github.com/BohemianCoding/SketchAPI/pull/561))
+- `centerOnLayer` wasn't centering on nested layers ([https://github.com/BohemianCoding/SketchAPI/pull/562](https://github.com/BohemianCoding/SketchAPI/pull/562))
 
 ---
-As always, if you have any questions or feedback be sure to comment below!
+Thanks to Mathieu (@mathieudutour) for lots of these additions! As always, if you have any questions or feedback be sure to comment below!
