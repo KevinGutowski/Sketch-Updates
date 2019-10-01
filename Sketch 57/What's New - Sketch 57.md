@@ -11,7 +11,7 @@ Hiya everyone! Sketch 57 was released... well a little while ago! I took a littl
 ### Exposed `PointType` enum on `ShapePath`
 ##### More details
 - Quick refresher, `PointType` is referring to how the Bezier handles behave at a point.
-[insert image here]
+![Point types in sketch](https://github.com/KevinGutowski/Sketch-Updates/blob/master/Sketch%2057/imgs/pointtype.png?raw=true)
 -  This enum makes it easier to figure out what the different options for `PointType` are.
 
 ##### Github PR
